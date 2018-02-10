@@ -1,11 +1,11 @@
 #!/bin/sh -e
 
 # Edit the following to change the name of the database user that will be created:
-APP_DB_USER=myapp
-APP_DB_PASS=dbpass
+APP_DB_USER=pb_user
+APP_DB_PASS=pb_pass
 
 # Edit the following to change the name of the database that is created (defaults to the user name)
-APP_DB_NAME=$APP_DB_USER
+APP_DB_NAME=parcelbright
 
 # Edit the following to change the version of PostgreSQL that is installed
 PG_VERSION=9.4
@@ -60,6 +60,8 @@ then
 fi
 
 # Update package list and upgrade all packages
+# - Add java oracle repository
+add-apt-repository -y ppa:webupd8team/java
 apt-get update
 apt-get -y upgrade
 
@@ -68,6 +70,9 @@ apt-get -y install "postgresql-$PG_VERSION" "postgresql-contrib-$PG_VERSION"
 PG_CONF="/etc/postgresql/$PG_VERSION/main/postgresql.conf"
 PG_HBA="/etc/postgresql/$PG_VERSION/main/pg_hba.conf"
 PG_DIR="/var/lib/postgresql/$PG_VERSION/main"
+
+# Install dev lib
+apt-get -y install libpq-dev
 
 # Edit postgresql.conf to change listen address to '*':
 sed -i "s/#listen_addresses = 'localhost'/listen_addresses = '*'/" "$PG_CONF"
@@ -99,3 +104,30 @@ date > "$PROVISIONED_ON"
 echo "Successfully created PostgreSQL dev virtual machine."
 echo ""
 print_db_usage
+
+# Install java
+echo debconf shared/accepted-oracle-license-v1-1 select true | debconf-set-selections
+$ echo debconf shared/accepted-oracle-license-v1-1 seen true | debconf-set-selections
+apt-get -y install oracle-java8-installer
+
+# Install elasticsearch
+wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.2.1.deb
+
+dpkg -i elasticsearch-6.2.1.deb
+
+# Install chruby
+wget -O chruby-0.3.9.tar.gz https://github.com/postmodern/chruby/archive/v0.3.9.tar.gz
+tar -xzvf chruby-0.3.9.tar.gz
+cd chruby-0.3.9/
+sudo make install
+
+cd ~
+
+# Install ruby-install
+wget -O ruby-install-0.6.1.tar.gz https://github.com/postmodern/ruby-install/archive/v0.6.1.tar.gz
+tar -xzvf ruby-install-0.6.1.tar.gz
+cd ruby-install-0.6.1/
+sudo make install
+
+# Install ruby
+ruby-install ruby
