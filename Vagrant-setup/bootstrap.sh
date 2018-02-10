@@ -115,11 +115,16 @@ wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.2.1.de
 
 dpkg -i elasticsearch-6.2.1.deb
 
+# Install make
+sudo apt-get install make
+
 # Install chruby
 wget -O chruby-0.3.9.tar.gz https://github.com/postmodern/chruby/archive/v0.3.9.tar.gz
 tar -xzvf chruby-0.3.9.tar.gz
 cd chruby-0.3.9/
 sudo make install
+
+echo 'source /usr/local/share/chruby/chruby.sh' >> ~/.bashrc
 
 cd ~
 
@@ -130,4 +135,4 @@ cd ruby-install-0.6.1/
 sudo make install
 
 # Install ruby
-ruby-install ruby
+ruby-install ruby 2.3.4
