@@ -8,6 +8,10 @@ SCRIPT
 
 Vagrant.configure("2") do |config|
   config.vm.provision "shell", inline: $script
+  config.vm.synced_folder "./parcelbright-web", "/app"
+  config.vm.provider("virtualbox") do |vb| 
+    vb.memory = "6144"
+  end
 end
 
 Vagrant::Config.run do |config|
